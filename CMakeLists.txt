@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 3.9)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_SEARCH_ENGINE_DEBUG")
+
+set(BASE_NAME "SEARCH_ENGINE")
+project(${BASE_NAME} C)
+
+MACRO(create_project _name type)
+    set(name "${BASE_NAME}_${_name}")
+    set(src ${name}_SRC)
+    project("${name}" C)
+
+    set(src ${ARGN})
+
+    if ("${type}" STREQUAL "LIBRARY")
+        add_library("${name}" STATIC ${src})
+    elseif ("${type}" STREQUAL "EXECUTABLE")
+        add_executable("${name}" ${src})
+    else ()
+        message(FATAL_ERROR "create_project supports only LIBRARY and EXECUTABLE")
+    endif ()
+    unset(src)
+    unset(name)
+ENDMACRO()
+MACRO(include_project name other)
+    target_link_libraries(${BASE_NAME}_${name} ${BASE_NAME}_${other})
+ENDMACRO()
+MACRO(include_raw_project name other)
+    target_link_libraries(${BASE_NAME}_${name} ${other})
+ENDMACRO()
+
+add_subdirectory(common)
+add_subdirectory(frontend)
+add_subdirectory(sandbox)
+
